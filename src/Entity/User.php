@@ -53,6 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->ads = new ArrayCollection();
         $this->createdAt = new \DateTime();
+        $this->roles = ['USER_ROLE'];
     }
 
     public function getId(): ?int

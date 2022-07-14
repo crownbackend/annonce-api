@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes as SWG;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
+#[SWG\Tag(name: 'Registration')]
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
@@ -27,6 +29,14 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register', methods: 'POST')]
+    #[SWG\Parameter(
+        name: 'form',
+        in: 'query',
+    )]
+    #[SWG\Response(
+        response: 201,
+        description: 'Create user',
+    )]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): JsonResponse
     {
         $user = new User();
