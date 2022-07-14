@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as SWG;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,7 +70,7 @@ class RegistrationController extends AbstractController
             return  $this->json($user, 201);
         }
 
-        return $this->json($form->getErrors(), 400);
+        return $this->json($this->getFormErrors($form), 400);
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
@@ -90,5 +91,26 @@ class RegistrationController extends AbstractController
         $this->addFlash('success', 'Your email address has been verified.');
 
         return $this->redirectToRoute('app_register');
+    }
+
+    protected function getFormErrors(Form $form)
+    {
+        $errors = array();
+
+        // Global
+        foreach ($form->getErrors() as $error) {
+            $errors[$form->getName()][] = $error->getMessage();
+        }
+
+        // Fields
+        foreach ($form as $child /** @var Form $child */) {
+            if (!$child->isValid()) {
+                foreach ($child->getErrors() as $error) {
+                    $errors[$child->getName()][] = $error->getMessage();
+                }
+            }
+        }
+
+        return $errors;
     }
 }
